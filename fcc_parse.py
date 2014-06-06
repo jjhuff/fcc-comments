@@ -2,12 +2,20 @@
 
 import feedparser
 import re
-import urllib
 import logging
+import urllib
 import cStringIO as StringIO
 from datetime import datetime
 from time import mktime
 import PyPDF2
+
+try:
+    from google.appengine.api import urlfetch
+    def fetch(url):
+        return urlfetch.fetch(url, deadline=2*60).content
+except:
+    def fetch(url):
+        return urllib.urlopen(url).read()
 
 BASE_URL = "http://apps.fcc.gov/ecfs/comment_search/rss?proceeding=14-28"
 
@@ -21,8 +29,8 @@ ADDRESS_REGEX = re.compile(r"(?:(.*) <br />)?\n(.*) <br />\n(.*), (..) ([^\s]+) 
 
 
 def ExtractText(pdf_url):
-    f = urllib.urlopen(pdf_url)
-    pdf = PyPDF2.PdfFileReader(StringIO.StringIO(f.read()))
+    f = fetch(pdf_url)
+    pdf = PyPDF2.PdfFileReader(StringIO.StringIO(f))
     pdf_text = ""
     for i in range(0,pdf.numPages):
         page = pdf.getPage(i)
@@ -80,7 +88,7 @@ def RunQuery(query):
     if query:
         url += "&"+query
     logging.info("Requesting:%s"%url)
-    d = feedparser.parse(url)
+    d = feedparser.parse(fetch(url))
     docs = []
     for e in d.entries:
         try:
