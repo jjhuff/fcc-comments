@@ -30,7 +30,7 @@ class ImportAll(webapp2.RequestHandler):
         f = open("zips.csv")
         for line in f:
             z = line.strip().split(",")[0]
-            taskqueue.add(queue_name="imports", url="/import?zip=%s"%z, method="GET", target="batch")
+            taskqueue.add(queue_name="zips", url="/import?zip=%s"%z, method="GET", target="batch")
 
 class ImportComments(webapp2.RequestHandler):
     def get(self):
