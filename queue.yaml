@@ -1,0 +1,9 @@
+# Set the total storage limit for all queues to 120MB
+total_storage_limit: 120M
+queue:
+- name: imports
+  target: batch
+  rate: 2/s
+  max_concurrent_requests: 5
+  retry_parameters:
+      task_retry_limit: 5
