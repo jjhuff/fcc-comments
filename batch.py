@@ -47,7 +47,11 @@ class ImportComments(webapp2.RequestHandler):
         for doc in docs:
             k = datastore.Comment.build_key("14-28", doc['id'])
             # Skip existing comments
-            if k.get():
+            c = k.get()
+            if c:
+                # If it doesn't have text, queue it up!
+                if not c.DocText:
+                    taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
                 continue
             c = datastore.Comment(key = k)
             c.Link = doc['link']
