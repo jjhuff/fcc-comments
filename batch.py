@@ -34,9 +34,14 @@ class ImportComments(webapp2.RequestHandler):
             query = ""
 
         docs = fcc_parse.RunQuery(query)
-        logging.info("Received %d docs for query '%s'"%(len(docs), query))
+        if len(docs) == 0:
+            logging.warning("Zero results.")
+            raise Exception("Zero results")
+
         if len(docs)>=500 and query!="":
             logging.warning("Possible limit reached on '%s'"%query)
+
+        logging.info("Received %d docs for query '%s'"%(len(docs), query))
 
         put_count = 0
         for doc in docs:

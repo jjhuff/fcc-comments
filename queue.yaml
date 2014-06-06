@@ -7,6 +7,8 @@ queue:
   max_concurrent_requests: 5
   retry_parameters:
       task_retry_limit: 5
+      min_backoff_seconds: 30
+      max_backoff_seconds: 600
 
 - name: extract
   target: batch
@@ -14,3 +16,5 @@ queue:
   max_concurrent_requests: 5
   retry_parameters:
       task_retry_limit: 5
+      min_backoff_seconds: 30
+      max_backoff_seconds: 600
