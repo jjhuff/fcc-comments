@@ -1,4 +1,4 @@
 cron:
-#- description: Update all trail ratings
-#  url: /updateratings
-#  schedule: every 12 hours
+- description: Pull latest batch
+  url: /import
+  schedule: every 30 minutes

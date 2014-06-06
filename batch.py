@@ -27,7 +27,17 @@ import fcc_parse
 class ImportComments(webapp2.RequestHandler):
     def get(self):
         zipcode = self.request.GET.get('zip')
-        docs = fcc_parse.RunQuery("address.zip=%s"%zipcode)
+        if zipcode:
+            query = "address.zip=%s"%zipcode
+        else:
+            query = ""
+
+        docs = fcc_parse.RunQuery(query)
+        logging.info("Received %d docs for query '%s'"%(len(docs), query))
+        if len(docs)>=500 and query!="":
+            logging.warning("Possible limit reached on '%s'"%query)
+
+        put_count = 0
         for doc in docs:
             k = datastore.Comment.build_key("14-28", doc['id'])
             # Skip existing comments
@@ -38,14 +48,17 @@ class ImportComments(webapp2.RequestHandler):
             c.Author = doc['author']
             c.DocUrl = doc['doc_url']
             c.DocText = doc['doc_text']
-            c.Received = doc['date_received']
-            c.Posted = doc['date_posted']
+            c.ReceivedDate = doc['date_received']
+            c.PostedDate = doc['date_posted']
             c.AddressLine1 = doc['address']['line1']
             c.AddressLine2 = doc['address']['line2']
             c.AddressCity = doc['address']['city']
             c.AddressState = doc['address']['state']
             c.AddressZip = doc['address']['zip']
             c.put()
+            put_count+=1
+
+        logging.info("Put %d docs"%(put_count))
 
 
 app = webapp2.WSGIApplication([

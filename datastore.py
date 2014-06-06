@@ -28,6 +28,8 @@ class Comment(ndb.Model):
     DocText = ndb.TextProperty(default=None)
     Received = ndb.StringProperty(default=None)
     Posted = ndb.StringProperty(default=None)
+    ReceivedDate = ndb.DateProperty(default=None)
+    PostedDate = ndb.DateTimeProperty(default=None)
     AddressLine1 = ndb.StringProperty(default=None)
     AddressLine2 = ndb.StringProperty(default=None)
     AddressCity = ndb.StringProperty(default=None)

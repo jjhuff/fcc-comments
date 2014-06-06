@@ -6,8 +6,10 @@ import re
 import urllib
 import logging
 import cStringIO as StringIO
+from datetime import datetime
+from time import mktime
 
-BASE_URL = "http://apps.fcc.gov/ecfs/comment_search/rss?proceeding=14-28&"
+BASE_URL = "http://apps.fcc.gov/ecfs/comment_search/rss?proceeding=14-28"
 
 ID_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/comment/view\?id=(\d+)")
 DOC_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/document/view\?id=\d+")
@@ -58,8 +60,8 @@ def _parse_entry(e):
             'author': e.author,
             'doc_url': DOC_REGEX.search(e.description).group(0),
             'doc_text': None,
-            'date_received': DATE_RECEIVED_REGEX.search(e.description).group(1),
-            'date_posted': DATE_POSTED_REGEX.search(e.description).group(1),
+            'date_received': datetime.strptime(DATE_RECEIVED_REGEX.search(e.description).group(1),"%m/%d/%y"),
+            'date_posted':  datetime.fromtimestamp(mktime(e.published_parsed)),
             'address':address_parsed
     }
     #try:
@@ -74,7 +76,11 @@ def _parse_entry(e):
 #   address.zip=98122
 #   address.state.stateCd=WA
 def RunQuery(query):
-    d = feedparser.parse(BASE_URL + query)
+    url = BASE_URL
+    if query:
+        url += "&"+query
+    logging.info("Requesting:%s"%url)
+    d = feedparser.parse(url)
     docs = []
     for e in d.entries:
         try:
@@ -86,3 +92,4 @@ def RunQuery(query):
 
 if __name__ == "__main__":
     print RunQuery("address.zip=98122")
+    #print RunQuery("")
