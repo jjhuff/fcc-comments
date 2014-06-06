@@ -10,5 +10,7 @@ basic_scaling:
     idle_timeout: 1m
 
 handlers:
+    - url: "/extract_text"
+      script: batch.app
     - url: "/import"
       script: batch.app

@@ -19,6 +19,7 @@ import datetime
 import logging
 
 import webapp2
+from google.appengine.api import taskqueue
 from google.appengine.ext import db
 
 import datastore
@@ -47,7 +48,6 @@ class ImportComments(webapp2.RequestHandler):
             c.Link = doc['link']
             c.Author = doc['author']
             c.DocUrl = doc['doc_url']
-            c.DocText = doc['doc_text']
             c.ReceivedDate = doc['date_received']
             c.PostedDate = doc['date_posted']
             c.AddressLine1 = doc['address']['line1']
@@ -56,12 +56,24 @@ class ImportComments(webapp2.RequestHandler):
             c.AddressState = doc['address']['state']
             c.AddressZip = doc['address']['zip']
             c.put()
+            taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
             put_count+=1
 
         logging.info("Put %d docs"%(put_count))
 
+class ExtractText(webapp2.RequestHandler):
+    def get(self):
+        preceeding = self.request.GET.get('preceeding', '14-28')
+        comment_id = self.request.GET.get('id')
+        comment = datastore.Comment.build_key(preceeding, comment_id).get()
+        if not comment:
+            logging.warning("Missing entity: %s/%s"%(preceeding, comment_id))
+            raise Exception("Missing entity")
+        comment.DocText = fcc_parse.ExtractText(comment.DocUrl)
+        comment.put()
 
 app = webapp2.WSGIApplication([
         ('/import', ImportComments),
+        ('/extract_text', ExtractText),
     ],debug=True)
 
