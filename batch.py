@@ -25,6 +25,13 @@ from google.appengine.ext import db
 import datastore
 import fcc_parse
 
+class ImportAll(webapp2.RequestHandler):
+    def get(self):
+        f = open("zips.csv")
+        for line in f:
+            z = line.strip().split(",")[0]
+            taskqueue.add(queue_name="imports", url="/import?zip=%s"%z, method="GET", target="batch")
+
 class ImportComments(webapp2.RequestHandler):
     def get(self):
         zipcode = self.request.GET.get('zip')
@@ -83,6 +90,7 @@ class ExtractText(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
         ('/import', ImportComments),
+        ('/import_all', ImportAll),
         ('/extract_text', ExtractText),
     ],debug=True)
 

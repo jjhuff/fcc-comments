@@ -26,11 +26,7 @@ import datastore
 
 class StartPage(webapp2.RequestHandler):
     def get(self):
-        f = open("zips.csv")
-        for line in f:
-            z = line.strip().split(",")[0]
-            taskqueue.add(queue_name="imports", url="/import?zip=%s"%z, method="GET", target="batch")
-            self.response.out.write(z+"\n")
+        self.response.out.write("OK\n")
 
 
 app = webapp2.WSGIApplication([
