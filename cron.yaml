@@ -2,4 +2,4 @@ cron:
 - description: Pull latest batch
   url: /import
   target: batch
-  schedule: every 30 minutes
+  schedule: every 10 minutes
