@@ -87,11 +87,11 @@ class ImportComments(webapp2.RequestHandler):
 
 class ExtractText(webapp2.RequestHandler):
     def get(self):
-        preceeding = self.request.GET.get('preceeding', '14-28')
+        proceeding = self.request.GET.get('proceeding', '14-28')
         comment_id = self.request.GET.get('id')
-        comment = datastore.Comment.build_key(preceeding, comment_id).get()
+        comment = datastore.Comment.build_key(proceeding, comment_id).get()
         if not comment:
-            logging.warning("Missing entity: %s/%s"%(preceeding, comment_id))
+            logging.warning("Missing entity: %s/%s"%(proceeding, comment_id))
             raise Exception("Missing entity")
         comment.DocText = fcc_parse.ExtractText(comment.DocUrl)
         comment.put()
