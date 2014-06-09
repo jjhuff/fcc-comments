@@ -9,3 +9,8 @@ indexes:
   - name: class_path
   - name: start_time
     direction: desc
+
+- kind: Comment
+  ancestor: yes
+  properties:
+  - name: RandomValue
