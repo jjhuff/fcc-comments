@@ -32,6 +32,11 @@
 
             .comment_text {
             }
+            .more {
+                clear: both;
+                text-align: center;
+                margin-top: 20px;
+            }
             .address {
                 float: right;
             }
@@ -48,12 +53,17 @@
     <body>
         <h1 class='title'>FCC Net Neutrality Comments</h1>
 
-        <div class='container cf'>
-            <p class='comment_text'>{{ comment.DocText }}</p>
-            <div class='address'>
-                <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
-                <div>{{ comment.ReceivedDate }}</div>
+        <div class='container'>
+            <div class='cf'>
+                <p class='comment_text'>{{ comment.DocText }}</p>
+                <div class='address'>
+                    <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
+                    <div>{{ comment.ReceivedDate }}</div>
+                    <div><a href="{{ comment_link }}">Link</a></div>
+                </div>
             </div>
+
+            <h2 class='more'><a href="/">More</a></h2>
         </div>
     </body>
 </html>

@@ -52,6 +52,10 @@ class Comment(ndb.Model):
         return ndb.Key("Proceeding", proceeding, "Comment", comment_id)
 
     @staticmethod
+    def getComment(proceeding, comment_id):
+        return Comment.build_key(proceeding, comment_id).get()
+
+    @staticmethod
     def getRandom(proceeding):
         ancestor_key = ndb.Key("Proceeding", proceeding)
         for x in range(0,100):

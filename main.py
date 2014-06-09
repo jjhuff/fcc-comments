@@ -41,11 +41,24 @@ class BaseHandler(webapp2.RequestHandler):
         rv = self.jinja2.render_template(_template, **context)
         self.response.write(rv)
 
+def permalinkForComment(comment):
+    return  webapp2.uri_for("comment", proceeding=comment.key.parent().id(), comment_id=comment.key.id())
+
 class Home(BaseHandler):
     def get(self):
         comment = datastore.Comment.getRandom("14-28")
         args = {
-            'comment': comment
+            'comment': comment,
+            'comment_link': permalinkForComment(comment)
+        }
+        self.render_response("index.html", **args)
+
+class Comment(BaseHandler):
+    def get(self, proceeding, comment_id):
+        comment = datastore.Comment.getComment(proceeding, comment_id)
+        args = {
+            'comment': comment,
+            'comment_link': permalinkForComment(comment)
         }
         self.render_response("index.html", **args)
 
@@ -53,6 +66,7 @@ def touch(entity):
     yield op.db.Put(entity)
 
 app = webapp2.WSGIApplication([
-        ('/', Home),
+        webapp2.Route(r'/', handler=Home, name='home'),
+        webapp2.Route(r'/comment/<proceeding>/<comment_id>', handler=Comment, name='comment'),
     ],debug=True)
 
