@@ -20,7 +20,7 @@ import logging
 
 import webapp2
 from google.appengine.api import taskqueue
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 import datastore
 import fcc_parse
@@ -96,9 +96,22 @@ class ExtractText(webapp2.RequestHandler):
         comment.DocText = fcc_parse.ExtractText(comment.DocUrl)
         comment.put()
 
+class QueryCount(webapp2.RequestHandler):
+    def get(self):
+        q = self.request.GET.get('q', '')
+        prop = self.request.GET.get('prop', '')
+        query = ndb.gql(q)
+
+        if prop:
+            for e in query:
+                self.response.out.write("%s\n"%str(getattr(e, prop)))
+        else:
+            self.response.out.write("%d\n"%query.count())
+
 app = webapp2.WSGIApplication([
         ('/import', ImportComments),
         ('/import_all', ImportAll),
         ('/extract_text', ExtractText),
+        ('/query', QueryCount),
     ],debug=True)
 
