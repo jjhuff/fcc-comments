@@ -55,6 +55,8 @@ class Home(BaseHandler):
 
 class Comment(BaseHandler):
     def get(self, proceeding, comment_id):
+        self.response.cache_control = 'public'
+        self.response.cache_control.max_age = 10*60
         comment = datastore.Comment.getComment(proceeding, comment_id)
         args = {
             'comment': comment,
