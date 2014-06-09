@@ -5,9 +5,13 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+includes:
+    - mapreduce/include.yaml
+
 handlers:
 - url: "/static"
   static_dir: static
-- url: "/start"
+
+- url: "/"
   script: main.app
 
