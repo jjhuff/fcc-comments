@@ -35,6 +35,11 @@ class ImportAll(webapp2.RequestHandler):
 class ImportComments(webapp2.RequestHandler):
     def get(self):
         zipcode = self.request.GET.get('zip')
+
+        if self.request.GET.get('queue'):
+            taskqueue.add(queue_name="imports", url="/import?zip=%s"%zipcode, method="GET", target="batch")
+            return
+
         if zipcode:
             query = "address.zip=%s"%zipcode
         else:
