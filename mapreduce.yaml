@@ -1,0 +1,8 @@
+mapreduce:
+- name: TouchAllComments
+  mapper:
+    input_reader: mapreduce.input_readers.DatastoreInputReader
+    handler: main.touch
+    params:
+    - name: entity_kind
+      default: "datastore.Comment"

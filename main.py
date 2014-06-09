@@ -21,15 +21,18 @@ import logging
 import webapp2
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
+from mapreduce import operation as op
 
 import datastore
 
-class StartPage(webapp2.RequestHandler):
+class Home(webapp2.RequestHandler):
     def get(self):
         self.response.out.write("OK\n")
 
+def touch(entity):
+    yield op.db.Put(entity)
 
 app = webapp2.WSGIApplication([
-        ('/start', StartPage),
+        ('/', Home),
     ],debug=True)
 
