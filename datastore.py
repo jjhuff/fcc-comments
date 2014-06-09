@@ -15,12 +15,16 @@
 #
 
 import datetime
+import struct
+import os
+
 from google.appengine.ext import ndb
 
 class Procedding(ndb.Model):
     pass
 
 class Comment(ndb.Model):
+    RandomValue = ndb.IntegerProperty()
     Crawled = ndb.DateTimeProperty(auto_now_add=True)
     Link = ndb.StringProperty(default=None)
     Author = ndb.StringProperty(default=None)
@@ -35,6 +39,9 @@ class Comment(ndb.Model):
     AddressCity = ndb.StringProperty(default=None)
     AddressState = ndb.StringProperty(default=None)
     AddressZip = ndb.StringProperty(default=None)
+
+    def _pre_put_hook(self):
+        self.RandomValue = struct.unpack("!l", os.urandom(4))[0]
 
     @staticmethod
     def build_key(proceeding, comment_id):
