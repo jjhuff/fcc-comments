@@ -17,17 +17,37 @@
 #
 import datetime
 import logging
+import os
 
 import webapp2
+
+
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
+from webapp2_extras import jinja2
+
 from mapreduce import operation as op
 
 import datastore
 
-class Home(webapp2.RequestHandler):
+class BaseHandler(webapp2.RequestHandler):
+    @webapp2.cached_property
+    def jinja2(self):
+        # Returns a Jinja2 renderer cached in the app registry.
+        return jinja2.get_jinja2(app=self.app)
+
+    def render_response(self, _template, **context):
+        # Renders a template and writes the result to the response.
+        rv = self.jinja2.render_template(_template, **context)
+        self.response.write(rv)
+
+class Home(BaseHandler):
     def get(self):
-        self.response.out.write("OK\n")
+        comment = datastore.Comment.getRandom("14-28")
+        args = {
+            'comment': comment
+        }
+        self.render_response("index.html", **args)
 
 def touch(entity):
     yield op.db.Put(entity)

@@ -20,7 +20,7 @@ import os
 
 from google.appengine.ext import ndb
 
-class Procedding(ndb.Model):
+class Proceeding(ndb.Model):
     pass
 
 class Comment(ndb.Model):
@@ -40,9 +40,24 @@ class Comment(ndb.Model):
     AddressState = ndb.StringProperty(default=None)
     AddressZip = ndb.StringProperty(default=None)
 
+    @staticmethod
+    def _random():
+        return struct.unpack("!l", os.urandom(4))[0]
+
     def _pre_put_hook(self):
-        self.RandomValue = struct.unpack("!l", os.urandom(4))[0]
+        self.RandomValue = Comment._random();
 
     @staticmethod
     def build_key(proceeding, comment_id):
         return ndb.Key("Proceeding", proceeding, "Comment", comment_id)
+
+    @staticmethod
+    def getRandom(proceeding):
+        ancestor_key = ndb.Key("Proceeding", proceeding)
+        for x in range(0,100):
+            e = Comment.query(ancestor=ancestor_key).filter(Comment.RandomValue >= Comment._random()).order(Comment.RandomValue).get()
+            if e.DocText != None:
+                return e
+        raise Exception("Can't find a valid comment")
+
+

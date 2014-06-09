@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>FCC Net Neutrality Comments</title>
+        <meta name="description" content="FCC Net Neutrality Comments">
+        <meta http-equiv="content-language" content="en-us">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--<link rel="shortcut icon" href="/favicon.ico" />-->
+        <base href="/" />
+        <link rel="shortcut icon" href="http://example.com/myicon.ico" />
+        <link rel="icon" type="image/png" href="/static/200px-NetNeutrality_logo.svg.png" />
+
+        <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
+
+        <style>
+            body {
+                font-family: 'Source Code Pro', monospace;
+            }
+
+            .title {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+            .container {
+                width: 500px;
+                font-size: 16px;
+                margin: 10px auto;
+
+            }
+
+            .comment_text {
+            }
+            .address {
+                float: right;
+            }
+            .cf:before, .cf:after {
+                content: " "; /* 1 */
+                display: table; /* 2 */
+            }
+
+            .cf:after {
+                clear: both;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class='title'>FCC Net Neutrality Comments</h1>
+
+        <div class='container cf'>
+            <p class='comment_text'>{{ comment.DocText }}</p>
+            <div class='address'>
+                <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
+                <div>{{ comment.ReceivedDate }}</div>
+            </div>
+        </div>
+    </body>
+</html>
