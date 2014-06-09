@@ -57,8 +57,9 @@ class ImportComments(webapp2.RequestHandler):
             c = k.get()
             if c:
                 # If it doesn't have text, queue it up!
-                if not c.DocText:
-                    taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
+                #if not c.DocText:
+                #    taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
+
                 # convert dates
                 if c.Posted or c.Received:
                     c.ReceivedDate = doc['date_received']
