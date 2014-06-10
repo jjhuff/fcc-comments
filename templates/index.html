@@ -55,8 +55,9 @@
             }
         </style>
         <script>
-            if (history.pushState) {
-                history.pushState({}, "", "{{ comment_link }}");
+            if ( history.replaceState) {
+                var path = "{{ comment_link }}"
+                history.replaceState({'path': path}, "", path);
             }
         </script>
     </head>
