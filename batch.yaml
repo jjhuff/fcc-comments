@@ -14,7 +14,7 @@ handlers:
       script: batch.app
     - url: "/extract_text"
       script: batch.app
-    - url: "/import_all"
-      script: batch.app
+#    - url: "/import_all"
+#      script: batch.app
     - url: "/import"
       script: batch.app
