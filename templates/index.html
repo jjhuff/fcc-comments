@@ -54,6 +54,11 @@
                 clear: both;
             }
         </style>
+        <script>
+            if (history.pushState) {
+                history.pushState({}, "", "{{ comment_link }}");
+            }
+        </script>
     </head>
     <body>
         <h1 class='title'><a href="/">FCC Net Neutrality Comments</a></h1>
@@ -64,7 +69,6 @@
                 <div class='address'>
                     <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
                     <div>{{ comment.ReceivedDate }}</div>
-                    <div><a href="{{ comment_link }}"></a></div>
                     <div><a href="{{ comment_link }}">Permalink</a></div>
                     <div><a href="{{ comment.Link }}" target="_blank">Original</a></div>
                 </div>
