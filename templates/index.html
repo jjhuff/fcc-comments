@@ -28,6 +28,7 @@
                 float:left;
                 left: 50%;
                 position: relative;
+                margin-bottom: 40px;
             }
             .comment_wrapper {
                 float: left;
@@ -40,8 +41,14 @@
             .more {
                 clear: both;
                 text-align: center;
-                margin-top: 20px;
             }
+            .more a {
+                text-decoration: none;
+            }
+            .more a:hover {
+                text-decoration: underline;
+            }
+
             .address {
                 float: right;
             }
@@ -59,6 +66,11 @@
                 var path = "{{ comment_link }}"
                 history.replaceState({'path': path}, "", path);
             }
+            document.onkeydown = function(e) {
+                if (e.keyCode == '32') { // space
+                    location.href = '/';
+                }
+            }
         </script>
     </head>
     <body>
@@ -75,7 +87,7 @@
             </div>
         </div>
 
-        <h2 class='more'><a href="/">Show me another</a></h2>
+        <h2 class='more'><a href="/">Next Comment</a></h2>
 
 
         <script>
