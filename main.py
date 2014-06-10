@@ -52,8 +52,6 @@ class IndexHandler(BaseHandler):
             comment = datastore.Comment.getComment(proceeding, comment_id)
             if not comment:
                 webapp2.abort(404)
-
-
         else:
             comment = datastore.Comment.getRandom(proceeding)
         args = {
