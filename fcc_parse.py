@@ -23,10 +23,48 @@ ID_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/comment/view\?id=(\d+)")
 DOC_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/document/view\?id=\d+")
 DATE_RECEIVED_REGEX = re.compile(r"Date Received:\s*([^\s]*) <br />")
 HEADER_REGEX = re.compile(r"\d+\.txt")
-PAGE_REGEX = re.compile(r"Page (\d+)")
+PAGE_REGEX = re.compile(r"\n*Page (\d+)")
 ADDRESS_REGEX = re.compile(r"(?:(.*) <br />)?\n(.*) <br />\n(.*), (..) ([^\s]+) <br />$")
 
 
+def extractTextFromPage(page):
+    text = ""
+    content = page["/Contents"].getObject()
+    if not isinstance(content, PyPDF2.pdf.ContentStream):
+        content = PyPDF2.pdf.ContentStream(content, page.pdf)
+    # Note: we check all strings are TextStringObjects.  ByteStringObjects
+    # are strings where the byte->string encoding was unknown, so adding
+    # them to the text here would be gibberish.
+    for operands, operator in content.operations:
+        #print "%s %s"%(operator, repr(operands))
+        if operator == "Tj":
+            for _text in operands:
+                if isinstance(_text, PyPDF2.pdf.TextStringObject):
+                    text += _text
+                elif isinstance(_text, PyPDF2.pdf.ByteStringObject):
+                    text += " "
+        elif operator == "T*":
+            text += "\n"
+        elif operator == "TD":
+#            if float(operands[0]) > .5:
+#                text += " "
+            for x in range(0, -int(operands[1])):
+                text += "\n"
+        elif operator == "'":
+            text += "\n"
+            _text = operands[0]
+            if isinstance(_text, PyPDF2.pdf.TextStringObject):
+                text += operands[0]
+        elif operator == '"':
+            _text = operands[2]
+            if isinstance(_text, PyPDF2.pdf.TextStringObject):
+                text += "\n"
+                text += _text
+        elif operator == "TJ":
+            for i in operands[0]:
+                if isinstance(i, PyPDF2.pdf.TextStringObject):
+                    text += i
+    return text
 
 def ExtractText(pdf_url):
     f = fetch(pdf_url)
@@ -34,10 +72,20 @@ def ExtractText(pdf_url):
     pdf_text = ""
     for i in range(0,pdf.numPages):
         page = pdf.getPage(i)
-        pdf_text += page.extractText()
+        pdf_text += extractTextFromPage(page)
 
     pdf_text = re.sub(HEADER_REGEX, "", pdf_text)
     pdf_text = re.sub(PAGE_REGEX, "", pdf_text)
+    CHAR_FIXES = {
+            u"\u2013": "...",
+            u"\ufb01": "\"",
+            u"\ufb02": "\"",
+            u"\u2122": "'",
+    }
+    for b,a in CHAR_FIXES.items():
+        pdf_text = pdf_text.replace(b, a);
+
+    #logging.info(repr(pdf_text))
     return pdf_text.strip()
 
 def _parse_entry(e):
