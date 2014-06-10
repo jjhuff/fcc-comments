@@ -6,3 +6,10 @@ mapreduce:
     params:
     - name: entity_kind
       default: "datastore.Comment"
+- name: ExtractAllPDFs
+  mapper:
+    input_reader: mapreduce.input_readers.DatastoreInputReader
+    handler: main.extract_text
+    params:
+    - name: entity_kind
+      default: "datastore.Comment"

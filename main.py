@@ -64,6 +64,9 @@ class IndexHandler(BaseHandler):
 def touch(entity):
     yield op.db.Put(entity)
 
+def extract_text(entity):
+    taskqueue.add(queue_name="extract", url="/extract_text?proceeding=%s&id=%s"%(entity.key.parent().id(), entity.key.id()), method="GET", target="batch")
+
 app = webapp2.WSGIApplication([
         webapp2.Route(r'/', handler=IndexHandler, name='home'),
         webapp2.Route(r'/comment/<proceeding>/<comment_id>', handler=IndexHandler, name='comment'),
