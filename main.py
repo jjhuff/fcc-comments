@@ -50,6 +50,10 @@ class IndexHandler(BaseHandler):
             self.response.cache_control = 'public'
             self.response.cache_control.max_age = 10*60
             comment = datastore.Comment.getComment(proceeding, comment_id)
+            if not comment:
+                webapp2.abort(404)
+
+
         else:
             comment = datastore.Comment.getRandom(proceeding)
         args = {
