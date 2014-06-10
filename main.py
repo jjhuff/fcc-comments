@@ -54,11 +54,14 @@ class IndexHandler(BaseHandler):
                 webapp2.abort(404)
         else:
             comment = datastore.Comment.getRandom(proceeding)
+
         args = {
             'comment': comment,
-            'comment_text': comment.DocText.replace('\n', '<br>'),
+            'comment_text': None,
             'comment_link': permalinkForComment(comment)
         }
+        if comment.DocText:
+            args['comment_text'] =  comment.DocText.replace('\n', '<br>')
         self.render_response("index.html", **args)
 
 def touch(entity):
