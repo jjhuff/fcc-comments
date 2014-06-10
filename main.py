@@ -44,22 +44,17 @@ class BaseHandler(webapp2.RequestHandler):
 def permalinkForComment(comment):
     return  webapp2.uri_for("comment", proceeding=comment.key.parent().id(), comment_id=comment.key.id())
 
-class Home(BaseHandler):
-    def get(self):
-        comment = datastore.Comment.getRandom("14-28")
+class IndexHandler(BaseHandler):
+    def get(self, proceeding="14-28", comment_id=None):
+        if comment_id:
+            self.response.cache_control = 'public'
+            self.response.cache_control.max_age = 10*60
+            comment = datastore.Comment.getComment(proceeding, comment_id)
+        else:
+            comment = datastore.Comment.getRandom(proceeding)
         args = {
             'comment': comment,
-            'comment_link': permalinkForComment(comment)
-        }
-        self.render_response("index.html", **args)
-
-class Comment(BaseHandler):
-    def get(self, proceeding, comment_id):
-        self.response.cache_control = 'public'
-        self.response.cache_control.max_age = 10*60
-        comment = datastore.Comment.getComment(proceeding, comment_id)
-        args = {
-            'comment': comment,
+            'comment_text': comment.DocText.replace('\n', '<br>'),
             'comment_link': permalinkForComment(comment)
         }
         self.render_response("index.html", **args)
@@ -68,7 +63,7 @@ def touch(entity):
     yield op.db.Put(entity)
 
 app = webapp2.WSGIApplication([
-        webapp2.Route(r'/', handler=Home, name='home'),
-        webapp2.Route(r'/comment/<proceeding>/<comment_id>', handler=Comment, name='comment'),
+        webapp2.Route(r'/', handler=IndexHandler, name='home'),
+        webapp2.Route(r'/comment/<proceeding>/<comment_id>', handler=IndexHandler, name='comment'),
     ],debug=True)
 
