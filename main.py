@@ -62,18 +62,22 @@ class BaseHandler(webapp2.RequestHandler):
 def permalinkForComment(comment):
     return  webapp2.uri_for("comment", proceeding=comment.key.parent().id(), comment_id=comment.key.id())
 
-def comment_text_for_tweet(comment):
+def comment_text_summary(comment):
     ss = summarize.SimpleSummarizer()
+
+    twitter = fb = "Public Comments on Net Neutrality"
     if comment.DocText:
         # Cleanup the text somewhat
         text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
-        summarized = ss.summarize(text, 1)
-        if len(summarized) > MAX_TWEET_SUMMARY_SIZE:
-            return "{0}...".format(summarized[0:MAX_TWEET_SUMMARY_SIZE])
-        else:
-            return summarized
-    else:
-        return "Public Comments on Net Neutrality"
+        # Make the twitter summary
+        twitter = ss.summarize(text, 1)
+        if len(twitter) > MAX_TWEET_SUMMARY_SIZE:
+            twitter = "{0}...".format(twitter[0:MAX_TWEET_SUMMARY_SIZE])
+
+        # FB allows one that's longer
+        fb = ss.summarize(text, 4)
+
+    return twitter, fb
 
 class IndexHandler(BaseHandler):
     def get(self, proceeding="14-28", comment_id=None):
@@ -86,11 +90,15 @@ class IndexHandler(BaseHandler):
         else:
             comment = datastore.Comment.getRandom(proceeding)
 
+        twitter_text, long_summary = comment_text_summary(comment)
         args = {
             'comment': comment,
             'comment_text': None,
             'comment_link': permalinkForComment(comment),
-            'comment_text_for_tweet': comment_text_for_tweet(comment)
+            'twitter_text': twitter_text,
+            'long_summary': long_summary,
+
+
         }
         if comment.DocText:
             args['comment_text'] =  comment.DocText.replace('\n\n', '</p>\n<p>').replace('\n', '');
