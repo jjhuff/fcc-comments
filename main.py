@@ -37,7 +37,7 @@ import datastore
 
 from summarize import summarize
 
-MAX_TWEET_SUMMARY_SIZE = 115
+MAX_TWEET_SUMMARY_SIZE = 96
 
 def urlencode_filter(s):
     if type(s) == 'Markup':
@@ -65,7 +65,9 @@ def permalinkForComment(comment):
 def comment_text_for_tweet(comment):
     ss = summarize.SimpleSummarizer()
     if comment.DocText:
-        summarized = ss.summarize(comment.DocText, 1)
+        # Cleanup the text somewhat
+        text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+        summarized = ss.summarize(text, 1)
         if len(summarized) > MAX_TWEET_SUMMARY_SIZE:
             return "{0}...".format(summarized[0:MAX_TWEET_SUMMARY_SIZE])
         else:
