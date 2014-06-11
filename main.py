@@ -70,13 +70,11 @@ def comment_text_summary(comment):
     if comment.DocText:
         # Cleanup the text somewhat
         text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+
         # Make the twitter summary
-        twitter = ss.summarize(text, 1)
+        twitter = fb = ss.summarize(str(text), 4)
         if len(twitter) > MAX_TWEET_SUMMARY_SIZE:
             twitter = "{0}...".format(twitter[0:MAX_TWEET_SUMMARY_SIZE])
-
-        # FB allows one that's longer
-        fb = ss.summarize(text, 4)
 
     return twitter, fb
 
