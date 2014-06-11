@@ -54,6 +54,9 @@
             .address {
                 float: right;
             }
+            .social {
+                float: left;
+            }
             .cf:before, .cf:after {
                 content: " "; /* 1 */
                 display: table; /* 2 */
@@ -95,13 +98,15 @@
                     <div>{{ comment.ReceivedDate }}</div>
                     <div><a href="{{ comment.Link }}" target="_blank">Original</a></div>
                 </div>
+                <div class='social'>
+                    <a href="https://twitter.com/share?text={{ comment_text_for_tweet | urlencode  }}&via=Net_Equality" class="twitter-share-button" data-lang="en" data-size="large">Tweet</a>
+                </div>
             </div>
         </div>
 
         <h2 class='more'><a href="/">Next Comment</a></h2>
-        <h2 class='more'><a href="https://twitter.com/share?text={{ comment_text_for_tweet | safe }}&via=Net_Equality" class="twitter-share-button" data-lang="en" data-size="large">Tweet</a></h2>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
+        <!-- Google Analytics -->
         <script>
           (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
           (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -110,7 +115,9 @@
 
           ga('create', 'UA-51792206-1', 'netequality.us');
           ga('send', 'pageview');
-
         </script>
+
+        <!-- Twitter -->
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
     </body>
 </html>
