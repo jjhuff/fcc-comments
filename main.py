@@ -73,7 +73,7 @@ def comment_text_for_tweet(comment):
         else:
             return summarized
     else:
-        return 'FCC Net Neutrality Comments'
+        return "Public Comments on Net Neutrality"
 
 class IndexHandler(BaseHandler):
     def get(self, proceeding="14-28", comment_id=None):
