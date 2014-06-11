@@ -15,12 +15,15 @@
 # limitations under the License.
 #
 #
+
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+
 import datetime
 import logging
-import os
 
 import webapp2
-
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
@@ -29,6 +32,10 @@ from webapp2_extras import jinja2
 from mapreduce import operation as op
 
 import datastore
+
+from summarize import summarize
+
+MAX_TWEET_SUMMARY_SIZE = 100
 
 class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
@@ -44,6 +51,17 @@ class BaseHandler(webapp2.RequestHandler):
 def permalinkForComment(comment):
     return  webapp2.uri_for("comment", proceeding=comment.key.parent().id(), comment_id=comment.key.id())
 
+def comment_text_for_tweet(comment):
+    ss = summarize.SimpleSummarizer()
+    if comment.DocText:
+        summarized = ss.summarize(comment.DocText, 1)
+        if len(summarized) > MAX_TWEET_SUMMARY_SIZE:
+            return "{0}...".format(summarized[0:MAX_TWEET_SUMMARY_SIZE])
+        else:
+            return summarized
+    else:
+        return 'FCC Net Neutrality Comments'
+
 class IndexHandler(BaseHandler):
     def get(self, proceeding="14-28", comment_id=None):
         if comment_id:
@@ -58,7 +76,8 @@ class IndexHandler(BaseHandler):
         args = {
             'comment': comment,
             'comment_text': None,
-            'comment_link': permalinkForComment(comment)
+            'comment_link': permalinkForComment(comment),
+            'comment_text_for_tweet': comment_text_for_tweet(comment)
         }
         if comment.DocText:
             args['comment_text'] =  comment.DocText.replace('\n\n', '</p>\n<p>').replace('\n', '');
