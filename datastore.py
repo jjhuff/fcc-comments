@@ -60,7 +60,7 @@ class Comment(ndb.Model):
         ancestor_key = ndb.Key("Proceeding", proceeding)
         for x in range(0,100):
             e = Comment.query(ancestor=ancestor_key).filter(Comment.RandomValue >= Comment._random()).order(Comment.RandomValue).get()
-            if e.DocText != None:
+            if e.DocText not in (None, ''):
                 return e
         raise Exception("Can't find a valid comment")
 
