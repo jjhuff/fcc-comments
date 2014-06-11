@@ -15,12 +15,18 @@
 # limitations under the License.
 #
 #
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
+
 import datetime
 import logging
 
 import webapp2
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+
+from summarize import summarize
 
 import datastore
 import fcc_parse
@@ -92,6 +98,7 @@ class ImportComments(webapp2.RequestHandler):
 
 class ExtractText(webapp2.RequestHandler):
     def get(self):
+        ss = summarize.SimpleSummarizer()
         proceeding = self.request.GET.get('proceeding', '14-28')
         comment_id = self.request.GET.get('id')
         comment = datastore.Comment.build_key(proceeding, comment_id).get()
@@ -99,6 +106,8 @@ class ExtractText(webapp2.RequestHandler):
             logging.warning("Missing entity: %s/%s"%(proceeding, comment_id))
             raise Exception("Missing entity")
         comment.DocText = fcc_parse.ExtractText(comment.DocUrl)
+        text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+        comment.DocSummary = ss.summarize(str(text), 4)
         comment.put()
 
 class QueryCount(webapp2.RequestHandler):
