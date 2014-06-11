@@ -22,12 +22,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 
 import datetime
 import logging
+import urllib
 
 import webapp2
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
 from webapp2_extras import jinja2
+from markupsafe import Markup
 
 from mapreduce import operation as op
 
@@ -35,13 +37,22 @@ import datastore
 
 from summarize import summarize
 
-MAX_TWEET_SUMMARY_SIZE = 100
+MAX_TWEET_SUMMARY_SIZE = 115
+
+def urlencode_filter(s):
+    if type(s) == 'Markup':
+        s = s.unescape()
+    s = s.encode('utf8')
+    s = urllib.quote_plus(s)
+    return Markup(s)
 
 class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def jinja2(self):
         # Returns a Jinja2 renderer cached in the app registry.
-        return jinja2.get_jinja2(app=self.app)
+        j = jinja2.get_jinja2(app=self.app)
+        j.environment.filters['urlencode'] = urlencode_filter
+        return j
 
     def render_response(self, _template, **context):
         # Renders a template and writes the result to the response.
