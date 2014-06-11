@@ -23,6 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 import datetime
 import logging
 import urllib
+import time
 
 import webapp2
 
@@ -81,6 +82,7 @@ def comment_text_summary(comment):
 
 class IndexHandler(BaseHandler):
     def get(self, proceeding="14-28", comment_id=None):
+        start = time.time()
         if comment_id:
             self.response.cache_control = 'public'
             self.response.cache_control.max_age = 10*60
@@ -89,8 +91,13 @@ class IndexHandler(BaseHandler):
                 webapp2.abort(404)
         else:
             comment = datastore.Comment.getRandom(proceeding)
+        logging.info("Fetch from datastore: %0.3f"%(time.time() -start))
 
+        start = time.time()
         twitter_text, long_summary = comment_text_summary(comment)
+        logging.info("Build summary: %0.3f"%(time.time() -start))
+
+        start = time.time()
         args = {
             'comment': comment,
             'comment_text': None,
@@ -103,6 +110,7 @@ class IndexHandler(BaseHandler):
         if comment.DocText:
             args['comment_text'] =  comment.DocText.replace('\n\n', '</p>\n<p>').replace('\n', '');
         self.render_response("index.html", **args)
+        logging.info("Render: %0.3f"%(time.time() -start))
 
 def touch(entity):
     yield op.db.Put(entity)
