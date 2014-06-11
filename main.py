@@ -117,6 +117,21 @@ class IndexHandler(BaseHandler):
 def touch(entity):
     yield op.db.Put(entity)
 
+def safe_str(s):
+    try:
+        return str(s)
+    except UnicodeEncodeError:
+        return s
+def summarize_doc(comment):
+    if comment.DocSummary:
+        return
+    if comment.DocText in (None, ''):
+        return
+    ss = summarize.SimpleSummarizer()
+    text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+    comment.DocSummary = ss.summarize(safe_str(text), 4)
+    yield op.db.Put(comment)
+
 def extract_text(entity):
     taskqueue.add(queue_name="extract", url="/extract_text?proceeding=%s&id=%s"%(entity.key.parent().id(), entity.key.id()), method="GET", target="batch")
 
