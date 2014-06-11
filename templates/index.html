@@ -29,12 +29,48 @@
         <style>
             body {
                 font-family: 'Source Code Pro', monospace;
-                /*overflow-x: hidden;*/
             }
-
+            html, body{
+                height: 100%;
+                margin: 0;
+            }
+            #container {
+                min-height: 100%;
+                margin: 0;
+            }
+            #content {
+                overflow:auto;
+                padding-bottom: 25px; /* must be same height as the footer */
+            }
+            #footer {
+                position: relative;
+                margin-top: -25px; /* negative value of footer height */
+                height: 25px;
+                clear: both;
+                margin-left: 10px;
+                z-index: 10;
+            }
+            #footer > .twitter-follow-button {
+                vertical-align: bottom;
+            }
+            @media only screen and (min-width : 1255px) {
+                #footer > .twitter-follow-button {
+                    margin: 0 auto;
+                    display: block;
+                    position: relative;
+                    top: -20px;
+                }
+            }
+            @media only screen and (max-width : 700px) {
+                #footer > .twitter-follow-button {
+                    display: block;
+                    margin: 5px auto 0 auto;
+                }
+            }
             .title {
                 text-align: center;
                 margin-bottom: 40px;
+                font-size: 36px;
             }
             .comment_container {
                 font-size: 16px;
@@ -50,16 +86,24 @@
                 left: -50%;
             }
             .comment_text {
-                white-space: normal;
+                font-size: 20px;
+                margin-bottom: 40px;
             }
             .more {
                 clear: both;
                 text-align: center;
+                margin-bottom: 5px;
             }
-            .more a {
+            .spacebar {
+                clear: both;
+                text-align: center;
+                font-size: 14px;
+            }
+            a {
                 text-decoration: none;
+                color: #336699;
             }
-            .more a:hover {
+            a:hover {
                 text-decoration: underline;
             }
 
@@ -98,25 +142,34 @@
         </script>
     </head>
     <body>
-        <h1 class='title'>Public Comments on Net Neutrality</h1>
+        <div id='container'>
+            <div id='content'>
+                <h1 class='title'>Public Comments on Net Neutrality</h1>
 
-        <div class='comment_container'>
-            <div class='comment_wrapper'>
-                <div class='comment_text'>
-                    <p>{{ comment_text | safe}}<p>
+                <div class='comment_container'>
+                    <div class='comment_wrapper'>
+                        <div class='comment_text'>
+                            <p>{{ comment_text | safe}}<p>
+                        </div>
+                        <div class='address'>
+                            <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
+                            <div>{{ comment.ReceivedDate }}</div>
+                            <div><a href="{{ comment.Link }}" target="_blank">Original</a></div>
+                        </div>
+                        <div class='social'>
+                            <a href="https://twitter.com/share?text={{ twitter_text | urlencode  }}&via=Net_Equality" class="twitter-share-button" data-lang="en" data-size="large"></a>
+                        </div>
+                    </div>
                 </div>
-                <div class='address'>
-                    <div>{{ comment.AddressCity}}, {{ comment.AddressState }}</div>
-                    <div>{{ comment.ReceivedDate }}</div>
-                    <div><a href="{{ comment.Link }}" target="_blank">Original</a></div>
-                </div>
-                <div class='social'>
-                    <a href="https://twitter.com/share?text={{ twitter_text | urlencode  }}&via=Net_Equality" class="twitter-share-button" data-lang="en" data-size="large">Tweet</a>
-                </div>
+
+                <h2 class='more'><a href="/">Next Comment</a></h2>
+                <div class='spacebar'>(or hit your spacebar)</div>
             </div>
         </div>
-
-        <h2 class='more'><a href="/">Next Comment</a></h2>
+        <div id="footer">
+            Created by <a href="https://twitter.com/intent/user?screen_name=jjhuff">@jjhuff</a>
+            and <a href="https://twitter.com/intent/user?screen_name=robdaemon">@robdaemon</a> with input from many.
+            <a href="https://twitter.com/Net_Equality" class="twitter-follow-button" data-show-count="false" data-lang="en"></a></div>
 
         <!-- Google Analytics -->
         <script>
