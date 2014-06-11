@@ -61,7 +61,7 @@ class IndexHandler(BaseHandler):
             'comment_link': permalinkForComment(comment)
         }
         if comment.DocText:
-            args['comment_text'] =  comment.DocText.replace('\n', '<br>')
+            args['comment_text'] =  comment.DocText.replace('\n\n', '</p>\n<p>').replace('\n', '');
         self.render_response("index.html", **args)
 
 def touch(entity):
