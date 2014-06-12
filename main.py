@@ -35,6 +35,7 @@ from markupsafe import Markup
 from mapreduce import operation as op
 
 import datastore
+import batch
 
 MAX_TWEET_SUMMARY_SIZE = 96
 DEFAULT_PROCEEDING = "14-28"
@@ -110,7 +111,7 @@ def touch(entity):
     yield op.db.Put(entity)
 
 def extract_text(entity):
-    taskqueue.add(queue_name="extract", url="/extract_text?proceeding=%s&id=%s"%(entity.key.parent().id(), entity.key.id()), method="GET", target="batch")
+    batch.ExtractText.addToQueue(entity)
 
 app = webapp2.WSGIApplication([
         webapp2.Route(r'/', handler=IndexHandler, name='home'),

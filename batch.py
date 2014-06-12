@@ -41,9 +41,10 @@ class ImportAll(webapp2.RequestHandler):
 class ImportComments(webapp2.RequestHandler):
     def get(self):
         zipcode = self.request.GET.get('zip')
+        proceeding = self.request.GET.get('proceeding', '14-28')
 
         if self.request.GET.get('queue'):
-            taskqueue.add(queue_name="imports", url="/import?zip=%s"%zipcode, method="GET", target="batch")
+            taskqueue.add(queue_name="imports", url="/import?proceeding=%s&zip=%s"%(proceeding, zipcode), method="GET", target="batch")
             return
 
         if zipcode:
@@ -54,7 +55,7 @@ class ImportComments(webapp2.RequestHandler):
         docs = fcc_parse.RunQuery(query)
         if len(docs) == 0:
             logging.warning("Zero results.")
-            raise Exception("Zero results")
+            webapp2.abort(404)
 
         if len(docs)>=500 and query!="":
             logging.warning("Possible limit reached on '%s'"%query)
@@ -63,14 +64,10 @@ class ImportComments(webapp2.RequestHandler):
 
         put_count = 0
         for doc in docs:
-            k = datastore.Comment.build_key("14-28", doc['id'])
+            k = datastore.Comment.build_key(proceeding, doc['id'])
             # Skip existing comments
             c = k.get()
             if c:
-                # If it doesn't have text, queue it up!
-                #if not c.DocText:
-                #    taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
-
                 # convert dates
                 if c.Posted or c.Received:
                     c.ReceivedDate = doc['date_received']
@@ -91,12 +88,16 @@ class ImportComments(webapp2.RequestHandler):
             c.AddressState = doc['address']['state']
             c.AddressZip = doc['address']['zip']
             c.put()
-            taskqueue.add(queue_name="extract", url="/extract_text?id=%s"%doc['id'], method="GET", target="batch")
+            ExtractText.addToQueue(c)
             put_count+=1
 
         logging.info("Put %d docs"%(put_count))
 
 class ExtractText(webapp2.RequestHandler):
+    @staticmethod
+    def addToQueue(c):
+        taskqueue.add(queue_name="extract", url="/extract_text?proceeding=%s&id=%s"%(c.key.parent().id(), c.key.id()), method="GET", target="batch")
+
     def get(self):
         ss = summarize.SimpleSummarizer()
         proceeding = self.request.GET.get('proceeding', '14-28')
