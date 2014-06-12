@@ -36,6 +36,8 @@ from mapreduce import operation as op
 
 import datastore
 
+from summarize import summarize
+
 MAX_TWEET_SUMMARY_SIZE = 96
 
 def urlencode_filter(s):
@@ -62,9 +64,18 @@ def permalinkForComment(comment):
     return  webapp2.uri_for("comment", proceeding=comment.key.parent().id(), comment_id=comment.key.id())
 
 def comment_text_summary(comment):
+    ss = summarize.SimpleSummarizer()
+
     twitter = fb = "Public Comments on Net Neutrality"
-    if comment.DocSummary:
-        twitter = fb = comment.DocSummary
+    if comment.DocText:
+        # Cleanup the text somewhat
+        text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+
+        if comment.DocSummary:
+            twitter = fb = comment.DocSummary
+        else:
+            twitter = fb = ss.summarize(str(text), 4)
+
         # Make the twitter summary
         if len(twitter) > MAX_TWEET_SUMMARY_SIZE:
             twitter = "{0}...".format(twitter[0:MAX_TWEET_SUMMARY_SIZE])
@@ -73,6 +84,7 @@ def comment_text_summary(comment):
 
 class IndexHandler(BaseHandler):
     def get(self, proceeding="14-28", comment_id=None):
+        start = time.time()
         if comment_id:
             self.response.cache_control = 'public'
             self.response.cache_control.max_age = 10*60
@@ -81,9 +93,13 @@ class IndexHandler(BaseHandler):
                 webapp2.abort(404)
         else:
             comment = datastore.Comment.getRandom(proceeding)
+        logging.info("Fetch from datastore: %0.3f"%(time.time() -start))
 
+        start = time.time()
         twitter_text, long_summary = comment_text_summary(comment)
+        logging.info("Build summary: %0.3f"%(time.time() -start))
 
+        start = time.time()
         args = {
             'comment': comment,
             'comment_text': None,
@@ -96,9 +112,25 @@ class IndexHandler(BaseHandler):
         if comment.DocText:
             args['comment_text'] =  comment.DocText.replace('\n\n', '</p>\n<p>').replace('\n', '');
         self.render_response("index.html", **args)
+        logging.info("Render: %0.3f"%(time.time() -start))
 
 def touch(entity):
     yield op.db.Put(entity)
+
+def safe_str(s):
+    try:
+        return str(s)
+    except UnicodeEncodeError:
+        return s
+def summarize_doc(comment):
+    if comment.DocSummary:
+        return
+    if comment.DocText in (None, ''):
+        return
+    ss = summarize.SimpleSummarizer()
+    text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
+    comment.DocSummary = ss.summarize(safe_str(text), 4)
+    yield op.db.Put(comment)
 
 def extract_text(entity):
     taskqueue.add(queue_name="extract", url="/extract_text?proceeding=%s&id=%s"%(entity.key.parent().id(), entity.key.id()), method="GET", target="batch")
