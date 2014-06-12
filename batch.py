@@ -68,13 +68,6 @@ class ImportComments(webapp2.RequestHandler):
             # Skip existing comments
             c = k.get()
             if c:
-                # convert dates
-                if c.Posted or c.Received:
-                    c.ReceivedDate = doc['date_received']
-                    c.PostedDate = doc['date_posted']
-                    c.Received = None
-                    c.Posted = None
-                    c.put()
                 continue
             c = datastore.Comment(key = k)
             c.Link = doc['link']
