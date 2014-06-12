@@ -93,6 +93,12 @@ class ImportComments(webapp2.RequestHandler):
 
         logging.info("Put %d docs"%(put_count))
 
+def safe_str(s):
+    try:
+        return str(s)
+    except UnicodeEncodeError:
+        return s
+
 class ExtractText(webapp2.RequestHandler):
     @staticmethod
     def addToQueue(c):
@@ -108,7 +114,7 @@ class ExtractText(webapp2.RequestHandler):
             raise Exception("Missing entity")
         comment.DocText = fcc_parse.ExtractText(comment.DocUrl)
         text = comment.DocText.replace('\n', ' ').replace('  ', ' ')
-        comment.DocSummary = ss.summarize(str(text), 4)
+        comment.DocSummary = ss.summarize(safe_str(text), 4)
         comment.put()
 
 class QueryCount(webapp2.RequestHandler):
