@@ -13,10 +13,3 @@ mapreduce:
     params:
     - name: entity_kind
       default: "datastore.Comment"
-- name: Summarize
-  mapper:
-    input_reader: mapreduce.input_readers.DatastoreInputReader
-    handler: main.summarize_doc
-    params:
-    - name: entity_kind
-      default: "datastore.Comment"
