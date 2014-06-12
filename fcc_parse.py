@@ -17,7 +17,7 @@ except:
     def fetch(url):
         return urllib.urlopen(url).read()
 
-BASE_URL = "http://apps.fcc.gov/ecfs/comment_search/rss?proceeding=14-28"
+BASE_URL = "http://apps.fcc.gov/ecfs/comment_search/rss?"
 
 ID_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/comment/view\?id=(\d+)")
 DOC_REGEX = re.compile(r"http://apps\.fcc\.gov/ecfs/document/view\?id=\d+")
@@ -132,9 +132,7 @@ def _parse_entry(e):
 #   address.zip=98122
 #   address.state.stateCd=WA
 def RunQuery(query):
-    url = BASE_URL
-    if query:
-        url += "&"+query
+    url = BASE_URL + query
     logging.info("Requesting:%s"%url)
     d = feedparser.parse(fetch(url))
     docs = []
@@ -147,5 +145,5 @@ def RunQuery(query):
     return docs
 
 if __name__ == "__main__":
-    print RunQuery("address.zip=98122")
+    print RunQuery("address.zip=98122&proceeding=14-28")
     #print RunQuery("")

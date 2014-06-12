@@ -41,17 +41,18 @@ class ImportAll(webapp2.RequestHandler):
 class ImportComments(webapp2.RequestHandler):
     def get(self):
         zipcode = self.request.GET.get('zip')
-        proceeding = self.request.GET.get('proceeding', '14-28')
+        proceeding = self.request.GET.get('proceeding')
 
         if self.request.GET.get('queue'):
             taskqueue.add(queue_name="imports", url="/import?proceeding=%s&zip=%s"%(proceeding, zipcode), method="GET", target="batch")
             return
 
         if zipcode:
-            query = "address.zip=%s"%zipcode
+            query = "address.zip=%s&"%zipcode
         else:
             query = ""
 
+        query += "proceeding=%s"%proceeding
         docs = fcc_parse.RunQuery(query)
         if len(docs) == 0:
             logging.warning("Zero results.")
@@ -99,7 +100,7 @@ class ExtractText(webapp2.RequestHandler):
 
     def get(self):
         ss = summarize.SimpleSummarizer()
-        proceeding = self.request.GET.get('proceeding', '14-28')
+        proceeding = self.request.GET.get('proceeding')
         comment_id = self.request.GET.get('id')
         comment = datastore.Comment.build_key(proceeding, comment_id).get()
         if not comment:
