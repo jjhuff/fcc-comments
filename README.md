@@ -9,3 +9,4 @@ Quick and dirty AppEngine app to archive comments submitted for the FCC Net Neut
 ```
  curl "localhost:8081/import?zip=98122&proceeding=14-28"
 ```
+3. Head to [http://localhost:8080] to see the result!
