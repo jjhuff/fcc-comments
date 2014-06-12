@@ -37,6 +37,7 @@ from mapreduce import operation as op
 import datastore
 
 MAX_TWEET_SUMMARY_SIZE = 96
+DEFAULT_PROCEEDING = "14-28"
 
 def urlencode_filter(s):
     if type(s) == 'Markup':
@@ -73,7 +74,13 @@ def comment_text_summary(comment):
     return twitter, fb
 
 class IndexHandler(BaseHandler):
-    def get(self, proceeding="14-28", comment_id=None):
+    def head(self, proceeding=DEFAULT_PROCEEDING, comment_id=None):
+        if comment_id:
+            comment = datastore.Comment.getComment(proceeding, comment_id)
+            if not comment:
+                webapp2.abort(404)
+
+    def get(self, proceeding=DEFAULT_PROCEEDING, comment_id=None):
         if comment_id:
             self.response.cache_control = 'public'
             self.response.cache_control.max_age = 10*60
