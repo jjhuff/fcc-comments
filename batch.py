@@ -58,7 +58,7 @@ class ImportComments(webapp2.RequestHandler):
             logging.warning("Zero results.")
             webapp2.abort(404)
 
-        if len(docs)>=500 and query!="":
+        if len(docs)>=500 and not zipcode:
             logging.warning("Possible limit reached on '%s'"%query)
 
         logging.info("Received %d docs for query '%s'"%(len(docs), query))
