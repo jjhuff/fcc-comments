@@ -2,4 +2,5 @@ cron:
     - description: Pull latest batch
       url: /import?proceeding=14-28
       target: batch
-      schedule: every 10 minutes
+      schedule: every 10 minutes from 07:00 to 19:00
+      timezone: America/New_York
